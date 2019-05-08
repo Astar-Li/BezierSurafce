@@ -1,105 +1,77 @@
 #include <cmath>
 
-
 #include "r3deditor_camera.h"
 
 using namespace r3deditor;
 
-Camera::Camera()
+Camera::Camera() :
+    quaternion_rx(1,0,0,0),
+    quaternion_ry(1,0,0,0),
+    quaternion_rz(1,0,0,0)
 {
-    setAngleX(0);
-    setAngleY(0);
-    setAngleZ(0);
-    setDx(0);
-    setDy(0);
-    setDz(0);
-}
-
-double Camera::angleX()
-{
-    return angle_x;
-}
-
-double Camera::angleY()
-{
-    return angle_y;
-}
-
-double Camera::angleZ()
-{
-    return angle_z;
+    angle.x = 0; angle.y = 0; angle.z = 0;
+    d.x = 0; d.y = 0; d.z = 0;
 }
 
 void Camera::setDx(double d)
 {
-    dx = d;
+    this->d.x = d;
     notifyObservers();
 }
 
 void Camera::setDy(double d)
 {
-    dy = d;
+    this->d.y = d;
     notifyObservers();
 }
 
 void Camera::setDz(double d)
 {
-    dz = d;
+    this->d.z = d;
     notifyObservers();
 }
 
 void Camera::setAngleX(double a)
 {
-    angle_x = a;
-
-    rx[0][0] = 1; rx[0][1] = 0;      rx[0][2] = 0;
-    rx[1][0] = 0; rx[1][1] = cos(a); rx[1][2] = -sin(a);
-    rx[2][0] = 0; rx[2][1] = sin(a); rx[2][2] = cos(a);
-
+    angle.x = a;
+    quaternion_rx = QQuaternion(cos(a/2), sin(a/2)*QVector3D(1,0,0));
     notifyObservers();
 }
 
 void Camera::setAngleY(double a)
 {
-    angle_y = a;
-
-    ry[0][0] = cos(a);  ry[0][1] = 0; ry[0][2] = sin(a);
-    ry[1][0] = 0;       ry[1][1] = 1; ry[1][2] = 0;
-    ry[2][0] = -sin(a); ry[2][1] = 0; ry[2][2] = cos(a);
-
+    angle.y = a;
+    quaternion_ry = QQuaternion(cos(a/2), sin(a/2)*QVector3D(0,1,0));
     notifyObservers();
 }
 
 void Camera::setAngleZ(double a)
 {
-    angle_z = a;
-
-    rz[0][0] = cos(a); rz[0][1] = -sin(a); rz[0][2] = 0;
-    rz[1][0] = sin(a); rz[1][1] = cos(a);  rz[1][2] = 0;
-    rz[2][0] = 0;      rz[2][1] = 0;       rz[2][2] = 1;
-
+    angle.z = a;
+    quaternion_rz = QQuaternion(cos(a/2), sin(a/2)*QVector3D(0,0,1));
     notifyObservers();
+}
+
+
+double Camera::angleX()
+{
+    return angle.x;
+}
+
+double Camera::angleY()
+{
+    return angle.y;
+}
+
+double Camera::angleZ()
+{
+    return angle.z;
 }
 
 Vertex2D Camera::apply(const Vertex3D &v)
 {
-    Vertex3D vres3d;
-    Vertex2D vres2d;
+    QQuaternion quartenion_res = quaternion_rx * quaternion_ry * quaternion_rz;
+    QVector3D qvres3d = quartenion_res.rotatedVector(QVector3D(v.x, v.y, v.z));
 
-    //rotate x
-    vres3d.x = rx[0][0] * v.x + rx[0][1] * v.y + rx[0][2] * v.z;
-    vres3d.y = rx[1][0] * v.x + rx[1][1] * v.y + rx[1][2] * v.z;
-    vres3d.z = rx[2][0] * v.x + rx[2][1] * v.y + rx[2][2] * v.z;
-    //rotate y
-    vres3d.x = ry[0][0] * vres3d.x + ry[0][1] * vres3d.y + ry[0][2] * vres3d.z;
-    vres3d.y = ry[1][0] * vres3d.x + ry[1][1] * vres3d.y + ry[1][2] * vres3d.z;
-    vres3d.z = ry[2][0] * vres3d.x + ry[2][1] * vres3d.y + ry[2][2] * vres3d.z;
-    //rotate z
-    vres3d.x = rz[0][0] * vres3d.x + rz[0][1] * vres3d.y + rz[0][2] * vres3d.z;
-    vres3d.y = rz[1][0] * vres3d.x + rz[1][1] * vres3d.y + rz[1][2] * vres3d.z;
-    vres3d.z = rz[2][0] * vres3d.x + rz[2][1] * vres3d.y + rz[2][2] * vres3d.z;
-
-    vres2d.x = vres3d.x + dx;
-    vres2d.y = vres3d.y + dy;
-    return vres2d;
+    return {qvres3d.x() + d.x, qvres3d.y() + d.y};
 }

@@ -3,7 +3,6 @@
 
 #include <QImage>
 
-#include "observer.h"
 #include "r3deditor_3d_types.h"
 #include "r3deditor_camera.h"
 

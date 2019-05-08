@@ -9,6 +9,7 @@ R3DEditor::R3DEditor() :
     //Dependency Injection (Constructor Injection)
     image_bufer(640, 480, QImage::Format_RGB32),
     wireframe_painter(scene, image_bufer, camera),
+    axis_painter(image_bufer, camera),
     mouse_control(camera)
 {
     camera.addObserver(*this);
@@ -40,8 +41,10 @@ void R3DEditor::sendMouseEvent(QMouseEvent *event)
 
 QImage& R3DEditor::imageBufer()
 {
-    image_bufer.fill(Qt::white);
+    image_bufer.fill(VIEWPORT_BACKGROUND_COLOR);
+
     wireframe_painter.perform();
+    axis_painter.perform();
 
     return image_bufer;
 }

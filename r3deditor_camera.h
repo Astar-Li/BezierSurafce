@@ -1,6 +1,8 @@
 #ifndef R3DEDITOR_CAMERA_H
 #define R3DEDITOR_CAMERA_H
 
+#include <QQuaternion>
+
 #include "observer.h"
 #include "r3deditor_3d_types.h"
 
@@ -23,14 +25,11 @@ namespace r3deditor
         double angleY();
         double angleZ();
 
-
-
         Vertex2D apply(const Vertex3D &v);
     private:
-        double    dx, dy, dz;
-
-        double    angle_x, angle_y, angle_z;
-        matrix3x3 rx, ry, rz;
+        Vertex3D    d;
+        Vertex3D    angle;
+        QQuaternion quaternion_rx, quaternion_ry, quaternion_rz;
     };
 }
 

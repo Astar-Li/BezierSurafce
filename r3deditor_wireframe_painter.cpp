@@ -15,7 +15,7 @@ void WireframePainter::perform()
 {
     QPainter qpainter;
     qpainter.begin(&image_bufer);
-    qpainter.setBrush(QBrush(Qt::black));
+    qpainter.setPen(QColor(VIEWPORT_WIREFRAME_EDGE_COLOR));
 
     Vertex2D v1, v2;
     for (auto& object : scene)

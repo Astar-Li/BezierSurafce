@@ -13,6 +13,7 @@
 #include "r3deditor_bezier_surface.h"
 #include "r3deditor_camera.h"
 #include "r3deditor_mouse_control.h"
+#include "r3deditor_axis_painter.h"
 
 namespace r3deditor
 {
@@ -33,6 +34,7 @@ namespace r3deditor
         Scene             scene;
         WireframePainter  wireframe_painter;
         Camera            camera;
+        AxisPainter       axis_painter;
         MouseControl      mouse_control;
     };
 }
