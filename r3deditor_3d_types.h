@@ -13,6 +13,7 @@ namespace r3deditor
     static const int    VIEWPORT_BACKGROUND_COLOR = 0x4a4f59;
     static const int    VIEWPORT_WIREFRAME_EDGE_COLOR = 0xd2d7dd;
 
+
     typedef double matrix3x3[3][3];
 
     struct Vertex2D

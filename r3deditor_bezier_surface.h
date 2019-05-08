@@ -22,6 +22,7 @@ namespace r3deditor
             //for WireframePainter
             EdgeList&   edgeList();
             VertexList& vertexList();
+            BezierSurfaceBMatrix& BMatrix();
         private:
             //main parametric equation
             Vertex3D r(double u, double v);

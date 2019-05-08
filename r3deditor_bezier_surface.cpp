@@ -165,6 +165,7 @@ void BezierSurface::wireframeRebuild(double du, double dv)
 
     // II.
     // adding polygons
+    int i = 0;
     edge_list = buildEdgeList(vertex_list, un, vn);
     /*r3deditor::Polygon poly;
     for (int v = 0; v < vn - 1; v++)
@@ -190,57 +191,11 @@ void BezierSurface::wireframeRebuild(double du, double dv)
             wireframe_->faceList().push_back(poly);
         }
     */
+}
 
-    // III.
-    // adding edges
-    // i = i(u,v) = un * v + u
-
-    /*
-    r3deditor::Edge edge_;
-    int v,u;
-    for (v = 0; v < vn - 1; v++)
-    {
-        for (u = 0; u < un - 1; u++)
-        {
-            //
-            //  0 - 0 - 0 - 0
-            //  |   |   |
-            //  0 - 0 - 0 - 0
-            //  |   |   |
-            //  0   0   0   0
-            //
-            edge_.v1 = un * v + u;
-            edge_.v2 = un * v + (u+1);
-            edge_list.push_back(edge_);
-            edge_.v1 = un * v + u;
-            edge_.v2 = un * (v + 1) + u;
-            edge_list.push_back(edge_);
-        }
-        //
-        //  0 - 0 - 0 - 0
-        //  |   |   |   |
-        //  0 - 0 - 0 - 0
-        //  |   |   |   |
-        //  0   0   0   0
-        //
-        edge_.v1 = un * v + u;
-        edge_.v2 = un * (v + 1) + u;
-        edge_list.push_back(edge_);
-    }
-    for (u = 0; u < un - 1; u++)
-    {
-
-        //
-        //  0 - 0 - 0 - 0
-        //  |   |   |   |
-        //  0 - 0 - 0 - 0
-        //  |   |   |   |
-        //  0 - 0 - 0 - 0
-        //
-        edge_.v1 = un * v + u;
-        edge_.v2 = un * v + (u+1);
-        edge_list.push_back(edge_);
-    }*/
+BezierSurfaceBMatrix& BezierSurface::BMatrix()
+{
+    return B;
 }
 
 BezierSurfaceEditor::BezierSurfaceEditor(BezierSurface &bezier_surface) :
@@ -251,5 +206,48 @@ BezierSurfaceEditor::BezierSurfaceEditor(BezierSurface &bezier_surface) :
 
 void BezierSurfaceEditor::drawTo(QImage &image_buf, Camera &camera)
 {
-    //image_buf.fill(Qt::red);
+    EdgeList edge_list;
+    VertexList vertex_list;
+    BezierSurfaceBMatrix &B = static_cast<BezierSurface&>(object).BMatrix();
+
+    //get vertex list
+    for (int i = 0; i < 4; i++)
+        for (int j = 0; j < 4; j++)
+            vertex_list.push_back(B[i][j]);
+
+    //get edge list
+    edge_list = buildEdgeList(vertex_list, 4, 4);
+
+
+    QPainter qpainter;
+    qpainter.begin(&image_buf);
+
+
+    //draw edges
+    qpainter.setPen(QColor(202, 255, 40));
+    Vertex2D v1, v2;
+    for (auto& edge : edge_list)
+    {
+        v1 = camera.apply(vertex_list[edge.v1]);
+        v2 = camera.apply(vertex_list[edge.v2]);
+
+        qpainter.drawLine(v1.x, v1.y, v2.x, v2.y);
+    }
+
+    //draw vertexes
+    qpainter.setPen(Qt::green);
+    qpainter.setBrush(Qt::green);
+    const int CONTROL_RECT_SIZE = 5;
+    Vertex2D v;
+    for (auto &vertex : vertex_list)
+    {
+        v = camera.apply(vertex);
+        qpainter.drawRect(v.x - CONTROL_RECT_SIZE, v.y - CONTROL_RECT_SIZE,
+                          CONTROL_RECT_SIZE*2, CONTROL_RECT_SIZE*2);
+    }
+
+
+
+
+    qpainter.end();
 }
