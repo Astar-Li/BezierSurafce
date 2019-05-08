@@ -5,6 +5,60 @@
 using namespace r3deditor;
 using namespace r3deditor::Objects;
 
+//Creates edge list interpreting vertex vector
+//as un*vn mesh
+r3deditor::EdgeList buildEdgeList(r3deditor::VertexList &vertex_list, int un, int vn)
+{
+    r3deditor::EdgeList edge_list;
+    r3deditor::Edge edge_;
+    int v,u;
+    for (v = 0; v < vn - 1; v++)
+    {
+        for (u = 0; u < un - 1; u++)
+        {
+            //
+            //  0 - 0 - 0 - 0
+            //  |   |   |
+            //  0 - 0 - 0 - 0
+            //  |   |   |
+            //  0   0   0   0
+            //
+            edge_.v1 = un * v + u;
+            edge_.v2 = un * v + (u+1);
+            edge_list.push_back(edge_);
+            edge_.v1 = un * v + u;
+            edge_.v2 = un * (v + 1) + u;
+            edge_list.push_back(edge_);
+        }
+        //
+        //  0 - 0 - 0 - 0
+        //  |   |   |   |
+        //  0 - 0 - 0 - 0
+        //  |   |   |   |
+        //  0   0   0   0
+        //
+        edge_.v1 = un * v + u;
+        edge_.v2 = un * (v + 1) + u;
+        edge_list.push_back(edge_);
+    }
+    for (u = 0; u < un - 1; u++)
+    {
+
+        //
+        //  0 - 0 - 0 - 0
+        //  |   |   |   |
+        //  0 - 0 - 0 - 0
+        //  |   |   |   |
+        //  0 - 0 - 0 - 0
+        //
+        edge_.v1 = un * v + u;
+        edge_.v2 = un * v + (u+1);
+        edge_list.push_back(edge_);
+    }
+
+    return edge_list;
+}
+
 BezierSurface::BezierSurface(BezierSurfaceBMatrix &Bref)
 {
     //B = Bref
@@ -94,7 +148,7 @@ VertexList& BezierSurface::vertexList()
 void BezierSurface::wireframeRebuild(double du, double dv)
 {
     vertex_list.clear();
-    edge_list.clear();
+    //edge_list.clear();
 
     // I.
     // adding mesh vertexes.
@@ -111,6 +165,7 @@ void BezierSurface::wireframeRebuild(double du, double dv)
 
     // II.
     // adding polygons
+    edge_list = buildEdgeList(vertex_list, un, vn);
     /*r3deditor::Polygon poly;
     for (int v = 0; v < vn - 1; v++)
         for (int u = 0; u < un - 1; u++)
@@ -139,6 +194,8 @@ void BezierSurface::wireframeRebuild(double du, double dv)
     // III.
     // adding edges
     // i = i(u,v) = un * v + u
+
+    /*
     r3deditor::Edge edge_;
     int v,u;
     for (v = 0; v < vn - 1; v++)
@@ -183,7 +240,7 @@ void BezierSurface::wireframeRebuild(double du, double dv)
         edge_.v1 = un * v + u;
         edge_.v2 = un * v + (u+1);
         edge_list.push_back(edge_);
-    }
+    }*/
 }
 
 BezierSurfaceEditor::BezierSurfaceEditor(BezierSurface &bezier_surface) :
@@ -194,5 +251,5 @@ BezierSurfaceEditor::BezierSurfaceEditor(BezierSurface &bezier_surface) :
 
 void BezierSurfaceEditor::drawTo(QImage &image_buf, Camera &camera)
 {
-    image_buf.fill(Qt::red);
+    //image_buf.fill(Qt::red);
 }
