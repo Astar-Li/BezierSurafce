@@ -39,16 +39,6 @@ namespace r3deditor
 
     typedef std::vector<Vertex3D> VertexList;
     typedef std::list<Edge>       EdgeList;
-
-    class Object
-    {
-    public:
-        //for WireframePainter
-        virtual EdgeList&   edgeList() = 0;
-        virtual VertexList& vertexList() = 0;
-    };
-
-    typedef std::list<std::unique_ptr<Object>> Scene;
 }
 
 #endif // R3DEDITOR_TYPES_H

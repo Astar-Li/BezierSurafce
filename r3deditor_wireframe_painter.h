@@ -5,6 +5,7 @@
 
 #include "r3deditor_3d_types.h"
 #include "r3deditor_camera.h"
+#include "r3deditor_scene.h"
 
 namespace r3deditor
 {

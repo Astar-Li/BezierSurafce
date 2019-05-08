@@ -28,6 +28,7 @@ R3DEditorViewport::R3DEditorViewport(R3DEditor &r3d_editor) : r3d_editor(r3d_edi
 
     r3d_editor.addBezierSurface(B2);
 
+    r3d_editor.editObject(0);
 }
 
 void R3DEditorViewport::handleNotification()

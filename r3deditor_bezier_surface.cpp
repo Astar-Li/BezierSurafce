@@ -1,3 +1,5 @@
+#include <QPainter>
+
 #include "r3deditor_bezier_surface.h"
 
 using namespace r3deditor;
@@ -10,6 +12,11 @@ BezierSurface::BezierSurface(BezierSurfaceBMatrix &Bref)
         for (int j = 0; j < 4; j++)
             B[i][j] = Bref[i][j];
     wireframeRebuild(0.09, 0.09);
+}
+
+ObjectEditor* BezierSurface::editorCreate()
+{
+    return new BezierSurfaceEditor(*this);
 }
 
 //main parametric equation
@@ -177,4 +184,15 @@ void BezierSurface::wireframeRebuild(double du, double dv)
         edge_.v2 = un * v + (u+1);
         edge_list.push_back(edge_);
     }
+}
+
+BezierSurfaceEditor::BezierSurfaceEditor(BezierSurface &bezier_surface) :
+    ObjectEditor (bezier_surface)
+{
+
+}
+
+void BezierSurfaceEditor::drawTo(QImage &image_buf, Camera &camera)
+{
+    image_buf.fill(Qt::red);
 }

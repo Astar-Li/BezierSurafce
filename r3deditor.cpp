@@ -10,9 +10,17 @@ R3DEditor::R3DEditor() :
     image_bufer(640, 480, QImage::Format_RGB32),
     wireframe_painter(scene, image_bufer, camera),
     axis_painter(image_bufer, camera),
-    mouse_control(camera)
+    mouse_control(camera),
+    p_object_editor(nullptr),
+    object_editor_painter(image_bufer, camera, p_object_editor)
 {
     camera.addObserver(*this);
+}
+
+R3DEditor::~R3DEditor()
+{
+    if (p_object_editor)
+        delete p_object_editor;
 }
 
 void R3DEditor::handleNotification()
@@ -39,12 +47,20 @@ void R3DEditor::sendMouseEvent(QMouseEvent *event)
     mouse_control.sendEvent(event);
 }
 
+void R3DEditor::editObject(int i)
+{
+    if (p_object_editor)
+        delete p_object_editor;
+    p_object_editor = scene[i]->editorCreate();
+}
+
 QImage& R3DEditor::imageBufer()
 {
     image_bufer.fill(VIEWPORT_BACKGROUND_COLOR);
 
     wireframe_painter.perform();
     axis_painter.perform();
+    object_editor_painter.perform();
 
     return image_bufer;
 }
