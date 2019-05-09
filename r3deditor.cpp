@@ -10,7 +10,6 @@ R3DEditor::R3DEditor() :
     image_bufer(640, 480, QImage::Format_RGB32),
     wireframe_painter(scene, image_bufer, camera),
     axis_painter(image_bufer, camera),
-    mouse_control(camera, p_object_editor),
     p_object_editor(nullptr),
     object_editor_painter(image_bufer, camera, p_object_editor)
 {
@@ -43,11 +42,6 @@ void R3DEditor::setImageBuferSize(int w, int h)
     notifyObservers();
 }
 
-void R3DEditor::mouseEvent(QMouseEvent *event)
-{
-    mouse_control.mouseEvent(event);
-}
-
 void R3DEditor::editObject(int i)
 {
     if (p_object_editor)
@@ -64,6 +58,60 @@ QImage& R3DEditor::imageBufer()
     object_editor_painter.perform();
 
     return image_bufer;
+}
+
+// -- camera
+//dx,dy
+void R3DEditor::setCameraDx(double d)
+{
+    camera.setDx(d);
+}
+void R3DEditor::setCameraDy(double d)
+{
+    camera.setDy(d);
+}
+void R3DEditor::setCameraDz(double d)
+{
+    camera.setDz(d);
+}
+//angle
+void R3DEditor::setCameraAngleX(double a)
+{
+    camera.setAngleX(a);
+}
+void R3DEditor::setCameraAngleY(double a)
+{
+    camera.setAngleY(a);
+}
+void R3DEditor::setCameraAngleZ(double a)
+{
+    camera.setAngleZ(a);
+}
+double R3DEditor::cameraAngleX()
+{
+    return camera.angleX();
+}
+double R3DEditor::cameraAngleY()
+{
+    return camera.angleY();
+}
+double R3DEditor::cameraAngleZ()
+{
+    return camera.angleZ();
+}
+
+bool R3DEditor::objectEditorLoaded()
+{
+    if (p_object_editor)
+        return true;
+    else
+        return false;
+}
+
+void R3DEditor::objectEditorMouseEvent(QMouseEvent *event)
+{
+    if (p_object_editor)
+        p_object_editor->mouseEvent(event, camera);
 }
 
 
