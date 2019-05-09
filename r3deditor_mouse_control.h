@@ -4,16 +4,18 @@
 #include <QMouseEvent>
 
 #include "r3deditor_camera.h"
+#include "r3deditor_object.h"
 
 namespace r3deditor
 {
     class MouseControl
     {
     public:
-        MouseControl(Camera &camera);
-        void sendEvent(QMouseEvent *event);
+        MouseControl(Camera &camera, PObjectEditor &p_object_editor);
+        void mouseEvent(QMouseEvent *event);
     private:
-        Camera &camera;
+        Camera         &camera;
+        PObjectEditor  &p_object_editor;
     };
 }
 #endif // R3DEDITOR_MOUSE_CONTROL_H

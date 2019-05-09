@@ -10,7 +10,7 @@ R3DEditor::R3DEditor() :
     image_bufer(640, 480, QImage::Format_RGB32),
     wireframe_painter(scene, image_bufer, camera),
     axis_painter(image_bufer, camera),
-    mouse_control(camera),
+    mouse_control(camera, p_object_editor),
     p_object_editor(nullptr),
     object_editor_painter(image_bufer, camera, p_object_editor)
 {
@@ -30,8 +30,9 @@ void R3DEditor::handleNotification()
 
 void R3DEditor::addBezierSurface(Objects::BezierSurfaceBMatrix &B)
 {
-    scene.push_back(std::unique_ptr<Object>(new Objects::BezierSurface(B)));
-    notifyObservers();
+    std::unique_ptr<Object> p_bezier_surface(new Objects::BezierSurface(B));
+    p_bezier_surface->addObserver(*this);
+    scene.push_back(std::move(p_bezier_surface));
 }
 
 void R3DEditor::setImageBuferSize(int w, int h)
@@ -42,9 +43,9 @@ void R3DEditor::setImageBuferSize(int w, int h)
     notifyObservers();
 }
 
-void R3DEditor::sendMouseEvent(QMouseEvent *event)
+void R3DEditor::mouseEvent(QMouseEvent *event)
 {
-    mouse_control.sendEvent(event);
+    mouse_control.mouseEvent(event);
 }
 
 void R3DEditor::editObject(int i)

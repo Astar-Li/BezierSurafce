@@ -26,7 +26,7 @@ namespace r3deditor
         R3DEditor();
         virtual ~R3DEditor();
         void setImageBuferSize(int w, int h);
-        void sendMouseEvent(QMouseEvent *event);
+        void mouseEvent(QMouseEvent *event);
         void editObject(int i);
         void addBezierSurface(Objects::BezierSurfaceBMatrix &B);
         //view

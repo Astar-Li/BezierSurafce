@@ -44,7 +44,7 @@ bool R3DEditorViewport::event(QEvent *event)
     if ((event->type() == QEvent::MouseMove) ||
         (event->type() == QEvent::MouseButtonPress) ||
         (event->type() == QEvent::MouseButtonRelease))
-        r3d_editor.sendMouseEvent(static_cast<QMouseEvent*>(event));
+        r3d_editor.mouseEvent(static_cast<QMouseEvent*>(event));
 
     ImageWidget::event(event);
     return true;

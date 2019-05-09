@@ -1,6 +1,8 @@
 #ifndef R3DEDITOR_BEZIER_SURFACE_H
 #define R3DEDITOR_BEZIER_SURFACE_H
 
+#include "QMouseEvent"
+
 #include "r3deditor_3d_types.h"
 #include "r3deditor_object.h"
 
@@ -18,19 +20,19 @@ namespace r3deditor
 
             //returns BezierEditor
             ObjectEditor* editorCreate();
+            Vertex3D      B(short int i, short int j);
+            void          setB(short int i, short int j, Vertex3D value);
 
             //for WireframePainter
             EdgeList&   edgeList();
             VertexList& vertexList();
-            BezierSurfaceBMatrix& BMatrix();
         private:
             //main parametric equation
             Vertex3D r(double u, double v);
             //characteristic polyhedra
-            BezierSurfaceBMatrix B;
-
+            BezierSurfaceBMatrix B_;
             //for WireframPainter
-            void wireframeRebuild(double du, double dv);
+            void wireframeRebuild();
             VertexList vertex_list;
             EdgeList   edge_list;
         };
@@ -39,7 +41,12 @@ namespace r3deditor
         {
         public:
             BezierSurfaceEditor(BezierSurface &bezier_surface);
+            // "control"
+            void mouseEvent(QMouseEvent *event, Camera &camera);
+            // "view"
             void drawTo(QImage &image_buf, Camera &camera);
+        private:
+            static const int CONTROL_CIRCLE_RADIUS = 5;
         };
     }
 }

@@ -1,15 +1,17 @@
 #ifndef RDEDITOR_OBJECT_H
 #define RDEDITOR_OBJECT_H
 
+#include <QMouseEvent>
 #include <QImage>
 
+#include "observer.h"
 #include "r3deditor_3d_types.h"
 #include "r3deditor_camera.h"
 
 namespace r3deditor
 {
     class ObjectEditor;
-    class Object
+    class Object : public Observable
     {
     public:
         //returns object's editor
@@ -25,6 +27,7 @@ namespace r3deditor
     public:
         ObjectEditor(Object &object);
         virtual void drawTo(QImage &image_buf, Camera &camera)= 0;
+        virtual void mouseEvent(QMouseEvent *event, Camera &camera) = 0;
     protected:
         Object &object;
     };

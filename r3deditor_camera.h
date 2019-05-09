@@ -26,10 +26,12 @@ namespace r3deditor
         double angleZ();
 
         Vertex2D apply(const Vertex3D &v);
+        Vertex2D applyWithoutD(const Vertex3D &v);
     private:
         Vertex3D    d;
         Vertex3D    angle;
         QQuaternion quaternion_rx, quaternion_ry, quaternion_rz;
+        QQuaternion quaternion_rxyz;
     };
 }
 

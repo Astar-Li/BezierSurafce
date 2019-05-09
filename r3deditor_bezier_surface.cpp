@@ -1,13 +1,15 @@
+#include <exception>
+
 #include <QPainter>
+#include <QDebug>
 
 #include "r3deditor_bezier_surface.h"
 
 using namespace r3deditor;
 using namespace r3deditor::Objects;
 
-//Creates edge list interpreting vertex vector
-//as un*vn mesh
-r3deditor::EdgeList buildEdgeList(r3deditor::VertexList &vertex_list, int un, int vn)
+//Creates edge list of an un*vn mesh, which stores vertexes in 1D vector
+r3deditor::EdgeList buildEdgeList(int un, int vn)
 {
     r3deditor::EdgeList edge_list;
     r3deditor::Edge edge_;
@@ -64,8 +66,8 @@ BezierSurface::BezierSurface(BezierSurfaceBMatrix &Bref)
     //B = Bref
     for (int i = 0; i < 4; i++)
         for (int j = 0; j < 4; j++)
-            B[i][j] = Bref[i][j];
-    wireframeRebuild(0.09, 0.09);
+            B_[i][j] = Bref[i][j];
+    wireframeRebuild();
 }
 
 ObjectEditor* BezierSurface::editorCreate()
@@ -73,9 +75,10 @@ ObjectEditor* BezierSurface::editorCreate()
     return new BezierSurfaceEditor(*this);
 }
 
-//main parametric equation
-//parametric equation r(u,v) = UMB(M^T)V
-// note: v = [1, v, v2, v3]^T
+// Main parametric equation of the Bezier Surface
+// r(u,v) = UMB(M^T)V
+// note (for bicubic Bezier Surface, which is implemented here):
+// v = [1, v, v2, v3]^T
 // 0 <= u <= 1, 0 <= v <= 1
 Vertex3D BezierSurface::r(double u, double v)
 {
@@ -106,9 +109,9 @@ Vertex3D BezierSurface::r(double u, double v)
     for (int i=0; i<4; i++)
        for (int j=0; j<4; j++)
        {
-           UMBx[i] += UM[j] * B[j][i].x;
-           UMBy[i] += UM[j] * B[j][i].y;
-           UMBz[i] += UM[j] * B[j][i].z;
+           UMBx[i] += UM[j] * B_[j][i].x;
+           UMBy[i] += UM[j] * B_[j][i].y;
+           UMBz[i] += UM[j] * B_[j][i].z;
        }
 
     //UMB(M^T)
@@ -145,8 +148,13 @@ VertexList& BezierSurface::vertexList()
     return vertex_list;
 }
 
-void BezierSurface::wireframeRebuild(double du, double dv)
+void BezierSurface::wireframeRebuild()
 {
+    const double du = 0.1;
+    const double dv = 0.1;
+    int un = 0;
+    int vn = 0;
+
     vertex_list.clear();
     //edge_list.clear();
 
@@ -157,16 +165,13 @@ void BezierSurface::wireframeRebuild(double du, double dv)
             vertex_list.push_back(r(u,v));
 
 
-    // surface mesh resoultion (un x vn)
-    int un = 0;
-    int vn = 0;
+    // surface mesh resoultion (un x vn) calc
     for (double v = 0; v <= 1.0; v += dv, ++vn);
     for (double u = 0; u <= 1.0; u += du, ++un);
 
     // II.
     // adding polygons
-    int i = 0;
-    edge_list = buildEdgeList(vertex_list, un, vn);
+    edge_list = buildEdgeList(un, vn);
     /*r3deditor::Polygon poly;
     for (int v = 0; v < vn - 1; v++)
         for (int u = 0; u < un - 1; u++)
@@ -191,11 +196,25 @@ void BezierSurface::wireframeRebuild(double du, double dv)
             wireframe_->faceList().push_back(poly);
         }
     */
+
+    notifyObservers();
 }
 
-BezierSurfaceBMatrix& BezierSurface::BMatrix()
+Vertex3D BezierSurface::B(short int i, short int j)
 {
-    return B;
+    if (!((0 <= i) && (i < 4) && (0 <= j) && (j < 4)))
+        throw std::range_error("In call of Vertex3D BezierSurfaceEditor::B(short int i, short int j) \
+                                - invalid i or j");
+    return B_[i][j];
+}
+
+void BezierSurface::setB(short int i, short int j, Vertex3D value)
+{
+    if (!((0 <= i) && (i < 4) && (0 <= j) && (j < 4)))
+        throw std::range_error("In call of Vertex3D BezierSurfaceEditor::B(short int i, short int j) \
+                                - invalid i or j");
+    B_[i][j] = value;
+    wireframeRebuild();
 }
 
 BezierSurfaceEditor::BezierSurfaceEditor(BezierSurface &bezier_surface) :
@@ -206,23 +225,20 @@ BezierSurfaceEditor::BezierSurfaceEditor(BezierSurface &bezier_surface) :
 
 void BezierSurfaceEditor::drawTo(QImage &image_buf, Camera &camera)
 {
-    EdgeList edge_list;
-    VertexList vertex_list;
-    BezierSurfaceBMatrix &B = static_cast<BezierSurface&>(object).BMatrix();
+    static EdgeList   edge_list = buildEdgeList(4, 4);
+    static VertexList vertex_list;
+    static BezierSurface &bezier_surface = static_cast<BezierSurface&>(object);
+    static QPainter qpainter;
 
     //get vertex list
-    for (int i = 0; i < 4; i++)
-        for (int j = 0; j < 4; j++)
-            vertex_list.push_back(B[i][j]);
-
-    //get edge list
-    edge_list = buildEdgeList(vertex_list, 4, 4);
+    vertex_list.clear();
+    for (short int i = 0; i < 4; i++)
+        for (short int j = 0; j < 4; j++)
+            vertex_list.push_back(bezier_surface.B(i,j));
 
 
-    QPainter qpainter;
+
     qpainter.begin(&image_buf);
-
-
     //draw edges
     qpainter.setPen(QColor(202, 255, 40));
     Vertex2D v1, v2;
@@ -237,17 +253,75 @@ void BezierSurfaceEditor::drawTo(QImage &image_buf, Camera &camera)
     //draw vertexes
     qpainter.setPen(Qt::green);
     qpainter.setBrush(Qt::green);
-    const int CONTROL_RECT_SIZE = 5;
     Vertex2D v;
     for (auto &vertex : vertex_list)
     {
         v = camera.apply(vertex);
-        qpainter.drawRect(v.x - CONTROL_RECT_SIZE, v.y - CONTROL_RECT_SIZE,
-                          CONTROL_RECT_SIZE*2, CONTROL_RECT_SIZE*2);
+        qpainter.drawEllipse(QPointF(v.x, v.y), CONTROL_CIRCLE_RADIUS, CONTROL_CIRCLE_RADIUS);
     }
 
-
-
-
     qpainter.end();
+}
+
+void BezierSurfaceEditor::mouseEvent(QMouseEvent *event, Camera &camera)
+{
+    static BezierSurface &bezier_surface = static_cast<BezierSurface&>(object);
+
+    //Bezier Surface B matrix projection
+    static Vertex2D B_2d[4][4];
+    static int click_x1;
+    static int click_y1;
+    static bool left_button_pressed = false;
+    static bool hit = false;
+    static short int  hit_i;
+    static short int  hit_j;
+    static Vertex3D hit_B_vertex;
+    if ((event->type() == QEvent::MouseButtonPress) && (event->button() == Qt::LeftButton))
+    {
+        left_button_pressed = true;
+        click_x1 = event->pos().rx();
+        click_y1 = event->pos().ry();
+
+        //calc projection of B points to viewport
+        for (short int i = 0; i < 4; i++)
+            for (short int j = 0; j < 4; j++)
+                B_2d[i][j] = camera.apply(bezier_surface.B(i,j));
+
+        // create matrix, in which every [i][j] element defines
+        // the square of distance between mouse click and B[i][j] point
+        // click_to_every_B_point_distance_squared = (B[i][j].x - click_x)^2 + (B[i][j].y - click_y)^2
+        double click_to_every_B_point_distance_squared[4][4];
+        for (short int i = 0; i < 4; i++)
+            for (short int j = 0; j < 4; j++)
+                click_to_every_B_point_distance_squared[i][j] =
+                        (B_2d[i][j].x - click_x1)*(B_2d[i][j].x - click_x1)
+                      + (B_2d[i][j].y - click_y1)*(B_2d[i][j].y - click_y1);
+
+        // find mouse to B point hit
+        for (short int i = 0; (i < 4) && (!hit); i++)
+            for (short int j = 0; (j < 4) && (!hit); j++)
+                if (click_to_every_B_point_distance_squared[i][j] <= CONTROL_CIRCLE_RADIUS * CONTROL_CIRCLE_RADIUS)
+                {
+                    hit = true;
+                    hit_i = i;
+                    hit_j = j;
+                    hit_B_vertex = bezier_surface.B(hit_i, hit_j);
+                }
+    }
+    if ((event->type() == QEvent::MouseMove)&&(left_button_pressed))
+    {
+        if (hit)
+        {
+            int dx = event->pos().rx() - click_x1;
+            int dy = event->pos().ry() - click_y1;
+
+            bezier_surface.setB(hit_i, hit_j, {hit_B_vertex.x + dx, hit_B_vertex.y + dy, hit_B_vertex.z});
+        }
+    }
+    if ((event->type() == QEvent::MouseButtonRelease) && (event->button() == Qt::LeftButton))
+    {
+        hit = false;
+        left_button_pressed = false;
+    }
+
 }
