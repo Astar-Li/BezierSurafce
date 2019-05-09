@@ -72,15 +72,24 @@ double Camera::angleZ()
     return angle.z;
 }
 
-Vertex2D Camera::apply(const Vertex3D &v)
-{    
-    QVector3D qvres3d = quaternion_rxyz.rotatedVector(QVector3D(v.x, v.y, v.z));
-    return {qvres3d.x() + d.x, qvres3d.y() + d.y};
+double Camera::dx()
+{
+    return d.x;
+}
+
+double Camera::dy()
+{
+    return d.x;
+}
+
+double Camera::dz()
+{
+    return d.x;
 }
 
 
-Vertex2D Camera::applyWithoutD(const Vertex3D &v)
+Vertex2D Camera::apply(const Vertex3D &v)
 {
-    QVector3D qvres3d = quaternion_rxyz.rotatedVector(QVector3D(v.x, v.y, v.z));
-    return {qvres3d.x(), qvres3d.y()};
+    QVector3D qvres3d = quaternion_rxyz.rotatedVector(QVector3D(v.x + d.x, v.y + d.y, v.z + d.z));
+    return {qvres3d.x() + d.x, qvres3d.y() + d.y};
 }

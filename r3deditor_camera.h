@@ -16,6 +16,9 @@ namespace r3deditor
         void setDx(double d);
         void setDy(double d);
         void setDz(double d);
+        double dx();
+        double dy();
+        double dz();
 
         //angle
         void setAngleX(double a);
@@ -26,7 +29,6 @@ namespace r3deditor
         double angleZ();
 
         Vertex2D apply(const Vertex3D &v);
-        Vertex2D applyWithoutD(const Vertex3D &v);
     private:
         Vertex3D    d;
         Vertex3D    angle;

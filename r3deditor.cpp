@@ -8,12 +8,11 @@ using namespace r3deditor;
 R3DEditor::R3DEditor() :
     //Dependency Injection (Constructor Injection)
     image_bufer(640, 480, QImage::Format_RGB32),
-    wireframe_painter(scene, image_bufer, camera),
-    axis_painter(image_bufer, camera),
+    axis_painter(image_bufer, camera_),
     p_object_editor(nullptr),
-    object_editor_painter(image_bufer, camera, p_object_editor)
+    object_editor_painter(image_bufer, camera_, p_object_editor)
 {
-    camera.addObserver(*this);
+    camera_.addObserver(*this);
 }
 
 R3DEditor::~R3DEditor()
@@ -34,14 +33,6 @@ void R3DEditor::addBezierSurface(Objects::BezierSurfaceBMatrix &B)
     scene.push_back(std::move(p_bezier_surface));
 }
 
-void R3DEditor::setImageBuferSize(int w, int h)
-{
-    image_bufer = QImage(w, h, QImage::Format_RGB32);
-    camera.setDx((double)w/2);
-    camera.setDy((double)h/2);
-    notifyObservers();
-}
-
 void R3DEditor::editObject(int i)
 {
     if (p_object_editor)
@@ -49,55 +40,14 @@ void R3DEditor::editObject(int i)
     p_object_editor = scene[i]->editorCreate();
 }
 
-QImage& R3DEditor::imageBufer()
+Camera& R3DEditor::camera()
 {
-    image_bufer.fill(VIEWPORT_BACKGROUND_COLOR);
-
-    wireframe_painter.perform();
-    axis_painter.perform();
-    object_editor_painter.perform();
-
-    return image_bufer;
+    return camera_;
 }
 
-// -- camera
-//dx,dy
-void R3DEditor::setCameraDx(double d)
+int R3DEditor::objects_n()
 {
-    camera.setDx(d);
-}
-void R3DEditor::setCameraDy(double d)
-{
-    camera.setDy(d);
-}
-void R3DEditor::setCameraDz(double d)
-{
-    camera.setDz(d);
-}
-//angle
-void R3DEditor::setCameraAngleX(double a)
-{
-    camera.setAngleX(a);
-}
-void R3DEditor::setCameraAngleY(double a)
-{
-    camera.setAngleY(a);
-}
-void R3DEditor::setCameraAngleZ(double a)
-{
-    camera.setAngleZ(a);
-}
-double R3DEditor::cameraAngleX()
-{
-    return camera.angleX();
-}
-double R3DEditor::cameraAngleY()
-{
-    return camera.angleY();
-}
-double R3DEditor::cameraAngleZ()
-{
-    return camera.angleZ();
+    return scene.size();
 }
 
 bool R3DEditor::objectEditorLoaded()
@@ -111,9 +61,18 @@ bool R3DEditor::objectEditorLoaded()
 void R3DEditor::objectEditorMouseEvent(QMouseEvent *event)
 {
     if (p_object_editor)
-        p_object_editor->mouseEvent(event, camera);
+        p_object_editor->mouseEvent(event, camera_);
 }
 
+VertexList R3DEditor::object_vertex_list(int i)
+{
+    return scene[i]->vertexList();
+}
+
+EdgeList R3DEditor::object_edge_list(int i)
+{
+    return scene[i]->edgeList();
+}
 
 
 

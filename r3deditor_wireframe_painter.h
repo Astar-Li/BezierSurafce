@@ -1,23 +1,20 @@
 #ifndef R3DEDITOR_PAINTERS_H
 #define R3DEDITOR_PAINTERS_H
 
-#include <QImage>
+#include <QQuaternion>
 
 #include "r3deditor_3d_types.h"
 #include "r3deditor_camera.h"
-#include "r3deditor_scene.h"
 
 namespace r3deditor
 {
     class WireframePainter
     {
     public:
-        WireframePainter(Scene &scene, QImage &image_bufer, Camera &camera);
-        void perform();
+        WireframePainter(QImage &image_bufer);
+        void drawEdges(const EdgeList &edge_list, const VertexList &vertex_list, Camera &camera);
     private:
-        Scene   &scene;
-        QImage  &image_bufer;
-        Camera  &camera;
+        QImage &image_bufer;
     };
 }
 

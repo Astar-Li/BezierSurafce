@@ -6,7 +6,10 @@
 
 using namespace r3deditor;
 
-R3DEditorViewport::R3DEditorViewport(R3DEditor &r3d_editor) : r3d_editor(r3d_editor)
+R3DEditorViewport::R3DEditorViewport(R3DEditor &r3d_editor) :
+    r3d_editor(r3d_editor),
+    image_bufer(QImage(640, 480, QImage::Format_RGB32)),
+    wirefram_painter(image_bufer)
 {
     r3d_editor.addObserver(*this);
 
@@ -28,19 +31,39 @@ R3DEditorViewport::R3DEditorViewport(R3DEditor &r3d_editor) : r3d_editor(r3d_edi
 
     r3d_editor.addBezierSurface(B2);
 
-    r3d_editor.editObject(0);
+    //r3d_editor.editObject(0);
+}
+
+void R3DEditorViewport::update()
+{
+    // R3DEDITOR VIEW
+
+    image_bufer.fill(VIEWPORT_BACKGROUND_COLOR);
+
+    for (int i = 0; i < r3d_editor.objects_n(); i++)
+        wirefram_painter.drawEdges(r3d_editor.object_edge_list(i),
+                                   r3d_editor.object_vertex_list(i),
+                                   r3d_editor.camera());
+
+    ImageWidget::setImage(image_bufer);
+    ImageWidget::update();
 }
 
 void R3DEditorViewport::handleNotification()
 {
-    setImage(r3d_editor.imageBufer());
+    update();
 }
 
 bool R3DEditorViewport::event(QEvent *event)
 {
+    //R3DEDITOR CONTROL
+
     //resize
     if (event->type() == QEvent::Resize)
-        r3d_editor.setImageBuferSize(width(), height());
+    {
+        image_bufer = QImage(width(), height(), QImage::Format_RGB32);
+        update();
+    }
 
     //mouse
     if ((event->type() == QEvent::MouseMove) ||
@@ -64,8 +87,8 @@ bool R3DEditorViewport::event(QEvent *event)
                 //save click's x,y and camera's x,z angles
                 x1      = mouse_event->pos().rx();
                 y1      = mouse_event->pos().ry();
-                angle_x1 = r3d_editor.cameraAngleX();
-                angle_z1 = r3d_editor.cameraAngleZ();
+                angle_x1 = r3d_editor.camera().angleX();
+                angle_z1 = r3d_editor.camera().angleZ();
             }
             if ((event->type() == QEvent::MouseMove)&&(left_button_pressed))
             {
@@ -85,8 +108,8 @@ bool R3DEditorViewport::event(QEvent *event)
                 if (angle_resx < -MATH_PI/2)
                     angle_resx = -MATH_PI/2;
 
-                r3d_editor.setCameraAngleX(angle_resx);
-                r3d_editor.setCameraAngleZ(angle_z1 + angle_z2);
+                r3d_editor.camera().setAngleX(angle_resx);
+                r3d_editor.camera().setAngleZ(angle_z1 + angle_z2);
             }
             if ((event->type() == QEvent::MouseButtonRelease) && (mouse_event->button() == Qt::LeftButton))
             {
