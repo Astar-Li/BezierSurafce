@@ -15,10 +15,8 @@ namespace r3deditor
         //dx,dy
         void setDx(double d);
         void setDy(double d);
-        void setDz(double d);
         double dx();
         double dy();
-        double dz();
 
         //angle
         void setAngleX(double a);
@@ -30,7 +28,7 @@ namespace r3deditor
 
         Vertex2D apply(const Vertex3D &v);
     private:
-        Vertex3D    d;
+        Vertex2D    d;
         Vertex3D    angle;
         QQuaternion quaternion_rx, quaternion_ry, quaternion_rz;
         QQuaternion quaternion_rxyz;

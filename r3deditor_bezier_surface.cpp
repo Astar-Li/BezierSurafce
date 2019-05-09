@@ -223,7 +223,7 @@ BezierSurfaceEditor::BezierSurfaceEditor(BezierSurface &bezier_surface) :
 
 }
 
-void BezierSurfaceEditor::drawTo(QImage &image_buf, Camera &camera)
+void BezierSurfaceEditor::paintTo(QImage &image_buf, Camera &camera)
 {
     static EdgeList   edge_list = buildEdgeList(4, 4);
     static VertexList vertex_list;

@@ -26,7 +26,7 @@ namespace r3deditor
     {
     public:
         ObjectEditor(Object &object);
-        virtual void drawTo(QImage &image_buf, Camera &camera)= 0;
+        virtual void paintTo(QImage &image_buf, Camera &camera)= 0;
         virtual void mouseEvent(QMouseEvent *event, Camera &camera) = 0;
     protected:
         Object &object;

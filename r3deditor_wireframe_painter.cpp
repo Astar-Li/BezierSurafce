@@ -17,8 +17,7 @@ void WireframePainter::drawEdges(const EdgeList &edge_list, const VertexList &ve
     qpainter.setPen(QColor(VIEWPORT_WIREFRAME_EDGE_COLOR));
 
     Vertex2D  v2d_1, v2d_2;
-    int viewport_width_div_2 = image_bufer.width() / 2.0;
-    int viewport_height_div_2 = image_bufer.height() / 2.0;
+
     for (auto& edge : edge_list)
     {
         //get points
@@ -26,10 +25,7 @@ void WireframePainter::drawEdges(const EdgeList &edge_list, const VertexList &ve
         v2d_2 = camera.apply(vertex_list[edge.v2]);
 
         //draw line
-        qpainter.drawLine(v2d_1.x + viewport_width_div_2,
-                          v2d_1.y + viewport_height_div_2,
-                          v2d_2.x + viewport_width_div_2,
-                          v2d_2.y + viewport_height_div_2);
+        qpainter.drawLine(v2d_1.x, v2d_1.y, v2d_2.x, v2d_2.y);
     }
 
     qpainter.end();

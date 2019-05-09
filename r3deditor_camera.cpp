@@ -11,7 +11,7 @@ Camera::Camera() :
     quaternion_rxyz(1,0,0,0)
 {
     angle.x = 0; angle.y = 0; angle.z = 0;
-    d.x = 0; d.y = 0; d.z = 0;
+    d.x = 0; d.y = 0;
 }
 
 void Camera::setDx(double d)
@@ -23,12 +23,6 @@ void Camera::setDx(double d)
 void Camera::setDy(double d)
 {
     this->d.y = d;
-    notifyObservers();
-}
-
-void Camera::setDz(double d)
-{
-    this->d.z = d;
     notifyObservers();
 }
 
@@ -82,14 +76,9 @@ double Camera::dy()
     return d.x;
 }
 
-double Camera::dz()
-{
-    return d.x;
-}
-
 
 Vertex2D Camera::apply(const Vertex3D &v)
 {
-    QVector3D qvres3d = quaternion_rxyz.rotatedVector(QVector3D(v.x + d.x, v.y + d.y, v.z + d.z));
+    QVector3D qvres3d = quaternion_rxyz.rotatedVector(QVector3D(v.x, v.y, v.z));
     return {qvres3d.x() + d.x, qvres3d.y() + d.y};
 }

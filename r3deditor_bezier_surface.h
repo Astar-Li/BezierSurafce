@@ -44,7 +44,7 @@ namespace r3deditor
             // "control"
             void mouseEvent(QMouseEvent *event, Camera &camera);
             // "view"
-            void drawTo(QImage &image_buf, Camera &camera);
+            void paintTo(QImage &image_buf, Camera &camera);
         private:
             static const int CONTROL_CIRCLE_RADIUS = 5;
         };

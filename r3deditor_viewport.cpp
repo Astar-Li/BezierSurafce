@@ -31,7 +31,7 @@ R3DEditorViewport::R3DEditorViewport(R3DEditor &r3d_editor) :
 
     r3d_editor.addBezierSurface(B2);
 
-    //r3d_editor.editObject(0);
+    r3d_editor.editObject(0);
 }
 
 void R3DEditorViewport::update()
@@ -40,10 +40,15 @@ void R3DEditorViewport::update()
 
     image_bufer.fill(VIEWPORT_BACKGROUND_COLOR);
 
+    //paint objects wireframes
     for (int i = 0; i < r3d_editor.objects_n(); i++)
         wirefram_painter.drawEdges(r3d_editor.object_edge_list(i),
                                    r3d_editor.object_vertex_list(i),
                                    r3d_editor.camera());
+
+    //paint object editor
+    if (r3d_editor.objectEditorLoaded())
+        r3d_editor.objectEditorPaintTo(image_bufer);
 
     ImageWidget::setImage(image_bufer);
     ImageWidget::update();
@@ -62,6 +67,8 @@ bool R3DEditorViewport::event(QEvent *event)
     if (event->type() == QEvent::Resize)
     {
         image_bufer = QImage(width(), height(), QImage::Format_RGB32);
+        r3d_editor.camera().setDx(width() / 2.0);
+        r3d_editor.camera().setDy(height() / 2.0);
         update();
     }
 

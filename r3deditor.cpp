@@ -9,8 +9,7 @@ R3DEditor::R3DEditor() :
     //Dependency Injection (Constructor Injection)
     image_bufer(640, 480, QImage::Format_RGB32),
     axis_painter(image_bufer, camera_),
-    p_object_editor(nullptr),
-    object_editor_painter(image_bufer, camera_, p_object_editor)
+    p_object_editor(nullptr)
 {
     camera_.addObserver(*this);
 }
@@ -19,6 +18,12 @@ R3DEditor::~R3DEditor()
 {
     if (p_object_editor)
         delete p_object_editor;
+}
+
+void R3DEditor::objectEditorPaintTo(QImage &image_bufer)
+{
+    if (p_object_editor)
+        p_object_editor->paintTo(image_bufer, camera_);
 }
 
 void R3DEditor::handleNotification()

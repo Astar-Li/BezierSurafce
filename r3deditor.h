@@ -14,7 +14,6 @@
 #include "r3deditor_camera.h"
 #include "r3deditor_axis_painter.h"
 #include "r3deditor_object.h"
-#include "r3deditor_object_editor_painter.h"
 #include "r3deditor_scene.h"
 
 namespace r3deditor
@@ -26,13 +25,15 @@ namespace r3deditor
         R3DEditor();
         virtual ~R3DEditor();
         void addBezierSurface(Objects::BezierSurfaceBMatrix &B);
+        // -- objects
+        int  objects_n();
+        VertexList object_vertex_list(int i);
+        EdgeList   object_edge_list(int i);
         // -- object editor
-        int objects_n();
         void editObject(int i);
         bool objectEditorLoaded();
         void objectEditorMouseEvent(QMouseEvent *event);
-        VertexList object_vertex_list(int i);
-        EdgeList   object_edge_list(int i);
+        void objectEditorPaintTo(QImage &image_bufer);
         // -- camera
         Camera& camera();
         //handles when model changes
@@ -43,7 +44,6 @@ namespace r3deditor
         Camera              camera_;
         AxisPainter         axis_painter;
         PObjectEditor       p_object_editor;
-        ObjectEditorPainter object_editor_painter;
     };
 }
 

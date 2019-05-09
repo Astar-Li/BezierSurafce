@@ -34,7 +34,6 @@ SOURCES += \
     r3deditor_bezier_surface.cpp \
     r3deditor_camera.cpp \
     r3deditor_axis_painter.cpp \
-    r3deditor_object_editor_painter.cpp \
     r3deditor_object.cpp
 
 HEADERS += \
@@ -48,7 +47,6 @@ HEADERS += \
     r3deditor_wireframe_painter.h \
     r3deditor_camera.h \
     r3deditor_axis_painter.h \
-    r3deditor_object_editor_painter.h \
     r3deditor_object.h \
     r3deditor_scene.h
 
