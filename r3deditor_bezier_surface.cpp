@@ -315,7 +315,12 @@ void BezierSurfaceEditor::mouseEvent(QMouseEvent *event, Camera &camera)
             int dx = event->pos().rx() - click_x1;
             int dy = event->pos().ry() - click_y1;
 
-            bezier_surface.setB(hit_i, hit_j, {hit_B_vertex.x + dx, hit_B_vertex.y + dy, hit_B_vertex.z});
+            QQuaternion camera_quaternion_inverted = camera.quaternion().inverted();
+            QVector3D move_vector = camera_quaternion_inverted.rotatedVector(QVector3D(dx,dy, 0));
+
+            bezier_surface.setB(hit_i, hit_j, {hit_B_vertex.x + move_vector.x(),
+                                               hit_B_vertex.y + move_vector.y(),
+                                               hit_B_vertex.z + move_vector.z()});
         }
     }
     if ((event->type() == QEvent::MouseButtonRelease) && (event->button() == Qt::LeftButton))

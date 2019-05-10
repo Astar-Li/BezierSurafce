@@ -26,7 +26,8 @@ namespace r3deditor
         double angleY();
         double angleZ();
 
-        Vertex2D apply(const Vertex3D &v);
+        Vertex2D    apply(const Vertex3D &v);
+        QQuaternion quaternion();
     private:
         Vertex2D    d;
         Vertex3D    angle;

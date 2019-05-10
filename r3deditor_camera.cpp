@@ -82,3 +82,8 @@ Vertex2D Camera::apply(const Vertex3D &v)
     QVector3D qvres3d = quaternion_rxyz.rotatedVector(QVector3D(v.x, v.y, v.z));
     return {qvres3d.x() + d.x, qvres3d.y() + d.y};
 }
+
+QQuaternion Camera::quaternion()
+{
+    return quaternion_rxyz;
+}
