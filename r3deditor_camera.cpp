@@ -73,7 +73,7 @@ double Camera::dx()
 
 double Camera::dy()
 {
-    return d.x;
+    return d.y;
 }
 
 

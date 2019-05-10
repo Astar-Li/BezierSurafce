@@ -1,5 +1,8 @@
 #include <QEvent>
 #include <QMouseEvent>
+#include <QKeyEvent>
+
+#include <QDebug>
 
 #include "r3deditor_viewport.h"
 #include "observer.h"
@@ -11,6 +14,7 @@ R3DEditorViewport::R3DEditorViewport(R3DEditor &r3d_editor) :
     image_bufer(QImage(640, 480, QImage::Format_RGB32)),
     wirefram_painter(image_bufer)
 {
+    this->setFocusPolicy(Qt::StrongFocus);
     r3d_editor.addObserver(*this);
 
     Objects::BezierSurfaceBMatrix B = {
@@ -62,6 +66,7 @@ void R3DEditorViewport::handleNotification()
 bool R3DEditorViewport::event(QEvent *event)
 {
     //R3DEDITOR CONTROL
+    static bool shift_pressed = false;
 
     //resize
     if (event->type() == QEvent::Resize)
@@ -72,6 +77,21 @@ bool R3DEditorViewport::event(QEvent *event)
         update();
     }
 
+    //keys
+    if (event->type() == QEvent::KeyPress)
+    {
+        QKeyEvent *key_event = static_cast<QKeyEvent*>(event);
+        if (key_event->key() == Qt::Key_Shift)
+            shift_pressed = true;
+    }
+
+    if (event->type() == QEvent::KeyRelease)
+    {
+        QKeyEvent *key_event = static_cast<QKeyEvent*>(event);
+        if (key_event->key() == Qt::Key_Shift)
+            shift_pressed = false;
+    }
+
     //mouse
     if ((event->type() == QEvent::MouseMove) ||
         (event->type() == QEvent::MouseButtonPress) ||
@@ -79,11 +99,10 @@ bool R3DEditorViewport::event(QEvent *event)
     {
         QMouseEvent *mouse_event = static_cast<QMouseEvent*>(event);
 
-        if (r3d_editor.objectEditorLoaded())
-            r3d_editor.objectEditorMouseEvent(mouse_event);
-        else
+        //rotate
+        if (shift_pressed)
         {
-            //rotate
+
             static double angle_x1, angle_z1;
             static double x1, y1;
             static bool   left_button_pressed = false;
@@ -122,6 +141,37 @@ bool R3DEditorViewport::event(QEvent *event)
             {
                 left_button_pressed = false;
             }
+        }
+        else
+        {
+            //move
+            static int x1, y1;
+            static int dx1, dy1;
+            static bool middle_button_pressed = false;
+            if ((mouse_event->type() == QEvent::MouseButtonPress)&&(mouse_event->button() == Qt::MiddleButton))
+            {
+                middle_button_pressed = true;
+                x1 = mouse_event->pos().rx();
+                y1 = mouse_event->pos().ry();
+                dx1 = r3d_editor.camera().dx();
+                dy1 = r3d_editor.camera().dy();
+            }
+            if ((mouse_event->type() == QEvent::MouseMove)&&(middle_button_pressed))
+            {
+                int dx2 = mouse_event->pos().rx() - x1;
+                int dy2 = mouse_event->pos().ry() - y1;
+
+                r3d_editor.camera().setDx(dx1 + dx2);
+                r3d_editor.camera().setDy(dy1 + dy2);
+            }
+            if ((mouse_event->type() == QEvent::MouseButtonRelease)&&(mouse_event->button() == Qt::MiddleButton))
+            {
+                middle_button_pressed = false;
+            }
+
+            //r3deditor.objectEditor
+            if ((!middle_button_pressed)&&(r3d_editor.objectEditorLoaded()))
+                r3d_editor.objectEditorMouseEvent(mouse_event);
         }
     }
 

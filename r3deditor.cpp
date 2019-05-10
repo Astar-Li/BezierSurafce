@@ -7,8 +7,6 @@ using namespace r3deditor;
 
 R3DEditor::R3DEditor() :
     //Dependency Injection (Constructor Injection)
-    image_bufer(640, 480, QImage::Format_RGB32),
-    axis_painter(image_bufer, camera_),
     p_object_editor(nullptr)
 {
     camera_.addObserver(*this);

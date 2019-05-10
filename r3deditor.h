@@ -12,7 +12,6 @@
 #include "r3deditor_wireframe_painter.h"
 #include "r3deditor_bezier_surface.h"
 #include "r3deditor_camera.h"
-#include "r3deditor_axis_painter.h"
 #include "r3deditor_object.h"
 #include "r3deditor_scene.h"
 
@@ -39,10 +38,8 @@ namespace r3deditor
         //handles when model changes
         virtual void handleNotification();
     private:
-        QImage              image_bufer;
         Scene               scene;
         Camera              camera_;
-        AxisPainter         axis_painter;
         PObjectEditor       p_object_editor;
     };
 }

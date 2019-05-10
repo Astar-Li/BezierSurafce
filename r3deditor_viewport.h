@@ -14,7 +14,7 @@ public:
     void update();
 private:
     bool event(QEvent *event);
-    r3deditor::R3DEditor &r3d_editor;
+    r3deditor::R3DEditor        &r3d_editor;
 
     QImage                      image_bufer;
     r3deditor::WireframePainter wirefram_painter;
