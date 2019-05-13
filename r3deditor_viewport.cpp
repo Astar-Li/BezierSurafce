@@ -12,30 +12,10 @@ using namespace r3deditor;
 R3DEditorViewport::R3DEditorViewport(R3DEditor &r3d_editor) :
     r3d_editor(r3d_editor),
     image_bufer(QImage(640, 480, QImage::Format_RGB32)),
-    wirefram_painter(image_bufer)
+    wireframe_painter(image_bufer)
 {
     this->setFocusPolicy(Qt::StrongFocus);
     r3d_editor.addObserver(*this);
-
-    Objects::BezierSurfaceBMatrix B = {
-            {{100-250,100-250, 0},   {200-250,100-250, 200}, {300-250,100-250, 200}, {400-250,100-250, 0}},
-            {{100-250,200-250, 200}, {200-250,200-250, -200}, {300-250,200-250, 400}, {400-250,200-250, 200}},
-            {{100-250,300-250, 200}, {200-250,300-250, 400}, {300-250,300-250, 400}, {400-250,300-250, 200}},
-            {{100-250,400-250, 0},   {200-250,400-250, 200}, {300-250,400-250, 200}, {400-250,400-250, 0}},
-        };
-
-    r3d_editor.addBezierSurface(B);
-
-   /* Objects::BezierSurfaceBMatrix B2 = {
-            {{100-250,100-250, 0},   {200-250,100-250, 0}, {300-250,100-250, 0}, {400-250,100-250, 0}},
-            {{100-250,200-250, 0}, {200-250,200-250, -0}, {300-250,200-250, 0}, {400-250,200-250, 0}},
-            {{100-250,300-250, 0}, {200-250,300-250, 0}, {300-250,300-250, 0}, {400-250,300-250, 0}},
-            {{100-250,400-250, 0},   {200-250,400-250, 0}, {300-250,400-250, 0}, {400-250,400-250, 0}},
-        };
-
-    r3d_editor.addBezierSurface(B2);*/
-
-    r3d_editor.editObject(0);
 }
 
 void R3DEditorViewport::update()
@@ -46,7 +26,7 @@ void R3DEditorViewport::update()
 
     //paint objects wireframes
     for (int i = 0; i < r3d_editor.objects_n(); i++)
-        wirefram_painter.drawEdges(r3d_editor.object_edge_list(i),
+        wireframe_painter.drawEdges(r3d_editor.object_edge_list(i),
                                    r3d_editor.object_vertex_list(i),
                                    r3d_editor.camera());
 
@@ -63,9 +43,9 @@ void R3DEditorViewport::handleNotification()
     update();
 }
 
+//R3DEDITOR CONTROL
 bool R3DEditorViewport::event(QEvent *event)
 {
-    //R3DEDITOR CONTROL
     static bool shift_pressed = false;
 
     //resize
@@ -102,7 +82,6 @@ bool R3DEditorViewport::event(QEvent *event)
         //rotate
         if (shift_pressed)
         {
-
             static double angle_x1, angle_z1;
             static double x1, y1;
             static bool   left_button_pressed = false;

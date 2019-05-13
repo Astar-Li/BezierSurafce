@@ -12,12 +12,11 @@ public:
     R3DEditorViewport(r3deditor::R3DEditor &r3d_editor);
     void handleNotification();
     void update();
-private:
     bool event(QEvent *event);
+private:
     r3deditor::R3DEditor        &r3d_editor;
-
     QImage                      image_bufer;
-    r3deditor::WireframePainter wirefram_painter;
+    r3deditor::WireframePainter wireframe_painter;
 };
 
 

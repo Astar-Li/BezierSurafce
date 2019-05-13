@@ -19,8 +19,6 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-private slots:
-    void on_pushButton_clicked();
 
 private:
     r3deditor::R3DEditor  r3d_editor;
